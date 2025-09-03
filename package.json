@@ -1,0 +1,57 @@
+{
+  "name": "magic-ui-elite",
+  "version": "1.0.0",
+  "description": "AI-powered multi-agent UI generator with live previews and collaborative iteration",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.0",
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "clsx": "^2.1.0",
+    "axios": "^1.6.0",
+    "zod": "^3.22.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.344.0",
+    "jszip": "^3.10.0",
+    "@types/jszip": "^3.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.55.0",
+    "eslint-config-next": "^14.0.0",
+    "prettier": "^3.1.0",
+    "@tailwindcss/typography": "^0.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/magic-ui-elite.git"
+  },
+  "keywords": [
+    "ui-generator",
+    "ai",
+    "nextjs",
+    "typescript",
+    "tailwindcss",
+    "multi-agent",
+    "live-preview"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

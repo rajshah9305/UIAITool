@@ -1,0 +1,44 @@
+{
+  "page_type": "dashboard",
+  "title": "Analytics Dashboard",
+  "sections": [
+    {
+      "id": "nav",
+      "type": "navbar",
+      "components": [
+        {"type": "logo"},
+        {"type": "search"},
+        {"type": "profile"}
+      ]
+    },
+    {
+      "id": "main",
+      "type": "main",
+      "layout": {
+        "grid": "12-col",
+        "breakpoints": {"sm": 1, "md": 6, "lg": 12}
+      },
+      "components": [
+        {"type": "sidebar", "width": "240px"},
+        {
+          "type": "content",
+          "components": [
+            {"type": "heading", "level": 1, "content": "Dashboard"},
+            {
+              "type": "stat_grid",
+              "columns": 3,
+              "items": [
+                {"type": "stat", "label": "Revenue"},
+                {"type": "stat", "label": "Users"},
+                {"type": "stat", "label": "Conversion"}
+              ]
+            },
+            {"type": "chart", "id": "line-1"}
+          ]
+        }
+      ]
+    }
+  ],
+  "states": ["loading", "empty", "error"],
+  "accessibility_notes": ["skip-to-content", "landmark-roles", "high-contrast-mode"]
+}
