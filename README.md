@@ -2,17 +2,13 @@
 
 AI-powered multi-agent UI generator with live previews and collaborative iteration.
 
-## Features
-
-- **Multi-Agent System**: Architect, Style Curator, Code Generator, Previewer, QA, Exporter
-- **Live Previews**: 4 simultaneous variant previews with real-time updates
-- **Agent Chat**: Collaborate with AI agents to refine designs
-- **Modern Tech Stack**: Next.js 14, TypeScript, Tailwind CSS, CrewAI
-- **Export Ready**: One-click export to production-ready projects
-
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/rajshah9305/UIAITool.git
+cd UIAITool
+
 # Install dependencies
 npm install
 
@@ -22,63 +18,44 @@ npm run dev
 # Visit http://localhost:3000
 ```
 
-## Usage
+## ✨ Features
 
-1. Enter your UI brief in the input field (e.g., "dashboard with sidebar and stats")
-2. Click "Generate" to create 4 design variants
-3. Chat with agents to refine specific aspects
-4. Select your preferred variant and export
+- **Multi-Agent System**: Architect, Style Curator, Code Generator, Previewer, QA, Exporter
+- **Live Previews**: 4 simultaneous variant previews with real-time updates
+- **Agent Chat**: Collaborate with AI agents to refine designs
+- **Modern Tech Stack**: Next.js 14, TypeScript, Tailwind CSS, Cerebras AI
+- **Export Ready**: One-click export to production-ready projects
 
-## Scripts
+## 🎨 Pre-built Themes
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run export:variant` - Export selected variant as zip
+1. **Retro Futurism** - Neon gradients with cyberpunk aesthetics
+2. **Glass Aurora** - Translucent glass effects with aurora gradients
+3. **Neo Brutalist** - Bold geometric shapes with high contrast
+4. **Minimal Mono** - Clean monochromatic design
 
-## Deploy to Vercel
+## 🔧 Environment Setup
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/magic-ui-elite)
-
-### Manual Deployment
-
-1. Push to GitHub
-2. Connect repository to Vercel
-3. Deploy automatically
-
-## Project Structure
-
-```
-magic-ui-elite/
-├── app/                    # Next.js app router
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Main dashboard
-├── components/            # React components
-│   └── ui/                # Reusable UI components
-├── public/               # Static assets
-│   └── previews/         # Generated preview files
-├── styles/               # CSS files
-└── package.json          # Dependencies and scripts
-```
-
-## Environment Variables
-
-### Optional Configuration
 ```bash
-# Copy the example environment file
+# Copy environment template
 cp .env.example .env.local
 
 # Add your Cerebras API key (optional)
 CEREBRAS_API_KEY=your_api_key_here
 ```
 
-**Note**: The application works without API keys using intelligent fallback responses. Add a Cerebras API key for enhanced AI-powered generation.
+**Note**: The application works without API keys using intelligent fallback responses.
 
-## Contributing
+## 📝 Usage
 
-This is a personal project. Feel free to fork and customize for your needs.
+1. Enter your UI brief (e.g., "dashboard with sidebar and stats")
+2. Click "Generate" to create 4 design variants
+3. Chat with agents to refine specific aspects
+4. Select your preferred variant and export
 
-## License
+## 🚀 Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/rajshah9305/UIAITool)
+
+## 📄 License
 
 MIT License - see LICENSE file for details.

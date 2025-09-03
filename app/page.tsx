@@ -22,14 +22,11 @@ export default function MagicUIElite() {
     loadExistingPreviews();
   }, []);
 
-  // Debug: Log variants when they change
-  useEffect(() => {
-    console.log('Variants loaded:', variants);
-  }, [variants]);
+
 
   const loadExistingPreviews = async () => {
     try {
-      console.log('Loading existing previews...');
+
       // Load existing preview variants
       const mockVariants: UIVariant[] = [
         {
@@ -428,37 +425,6 @@ export default function MagicUIElite() {
               </button>
             ))}
           </motion.div>
-        </div>
-
-        {/* Debug Info */}
-        <div className="mb-4 p-4 bg-gray-800 rounded-lg">
-          <p className="text-sm text-gray-300">Debug: {variants.length} variants loaded</p>
-          <button 
-            onClick={() => console.log('Current variants:', variants)}
-            className="mt-2 px-3 py-1 bg-gray-700 text-white text-xs rounded mr-2"
-          >
-            Log Variants
-          </button>
-          <button 
-            onClick={async () => {
-              const res = await fetch('/api/test');
-              const data = await res.json();
-              console.log('API Test:', data);
-            }}
-            className="mt-2 px-3 py-1 bg-blue-700 text-white text-xs rounded mr-2"
-          >
-            Test API
-          </button>
-          <button 
-            onClick={async () => {
-              const res = await fetch('/api/test-cerebras', { method: 'POST' });
-              const data = await res.json();
-              console.log('Cerebras Test:', data);
-            }}
-            className="mt-2 px-3 py-1 bg-green-700 text-white text-xs rounded"
-          >
-            Test Cerebras
-          </button>
         </div>
 
         {/* Variants Grid */}
