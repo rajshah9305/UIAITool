@@ -28,6 +28,8 @@
     "lucide-react": "^0.344.0",
     "jszip": "^3.10.0",
     "@types/jszip": "^3.4.0"
+   "@cerebras/sdk": "latest"
+}
   },
   "devDependencies": {
     "eslint": "^8.55.0",
