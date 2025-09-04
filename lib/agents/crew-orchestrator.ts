@@ -92,7 +92,7 @@ class CrewOrchestrator {
       );
 
       // Parse results and create variants
-      return this.parseWorkflowResults(architectAnalysis, styleVariants, codeImplementations, qaResults);
+      return this.parseWorkflowResults(brief, architectAnalysis, styleVariants, codeImplementations, qaResults);
 
     } catch (error) {
       console.error('Workflow execution failed:', error);
@@ -159,6 +159,7 @@ class CrewOrchestrator {
   }
 
   private parseWorkflowResults(
+    brief: UIBrief,
     architectAnalysis: string,
     styleVariants: string, 
     codeImplementations: string,
@@ -199,8 +200,7 @@ class CrewOrchestrator {
         accessibility: { score: 0, issues: [] }
       }
     ];
-
-  
+  }
 }
 
 export const crewOrchestrator = new CrewOrchestrator();
