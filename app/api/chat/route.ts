@@ -1,40 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { crewOrchestrator } from '@/lib/agents/crew-orchestrator';
-import { ChatMessage, AgentChatResponse } from '@/lib/types';
+import { UIBrief } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message, variantId, agent } = body;
+    const { description, type, requirements } = body;
 
-    if (!message) {
+    if (!description || typeof description !== 'string' || description.trim().length === 0) {
       return NextResponse.json(
-        { error: 'Message is required' },
+        { error: 'Description is required and must be a non-empty string.' },
         { status: 400 }
       );
     }
 
-    // Process the chat message and generate agent response
-    const response = await crewOrchestrator.handleAgentChat(message, agent);
+    const brief: UIBrief = {
+      description,
+      type: type || 'general',
+      requirements: requirements || []
+    };
+
+    const variants = await crewOrchestrator.executeWorkflow(brief);
 
     return NextResponse.json({
       success: true,
-      response: {
-        message: response,
-        suggestions: [
-          'Adjust colors and styling',
-          'Modify layout structure', 
-          'Add interactive features',
-          'Export the design'
-        ]
-      }
+      variants,
+      message: `Generated ${variants.length} UI variants successfully`
     });
 
   } catch (error) {
-    console.error('Chat error:', error);
+    console.error('Generation error:', error);
     return NextResponse.json(
       { 
-        error: 'Failed to process chat message',
+        error: 'Failed to generate UI variants',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
@@ -42,37 +40,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Removed - now handled by crewOrchestrator
-
-// Removed - now handled by crewOrchestrator
-
-// Removed - now handled by crewOrchestrator
-
-// Removed - handled by CrewAI
-
-// Removed - handled by CrewAI
-
-// Removed - handled by CrewAI
-
-// Removed - handled by CrewAI
-
-// Removed - handled by CrewAI
-
-// Removed - handled by CrewAI
-
-// Removed - handled by CrewAI
-
-// Removed - handled by CrewAI
-
 export async function GET() {
   return NextResponse.json({
-    message: 'Magic UI Elite Agent Chat API',
-    agents: [
-      'architect - UI structure and layout',
-      'style-curator - Visual design and themes',
-      'code-generator - Implementation and functionality',
-      'qa - Quality assurance and accessibility',
-      'exporter - Project export and deployment'
-    ]
+    message: 'Magic UI Elite Generation API',
+    endpoints: {
+      POST: 'Generate UI variants from description',
+      body: {
+        description: 'string (required)',
+        type: 'string (optional)',
+        requirements: 'string[] (optional)'
+      }
+    }
   });
 }
+
+
