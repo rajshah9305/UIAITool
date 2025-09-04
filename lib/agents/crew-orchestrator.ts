@@ -23,28 +23,28 @@ class CrewOrchestrator {
         role: 'UI/UX Architect',
         goal: 'Design intuitive and scalable user interface structures',
         backstory: 'You are an experienced UI architect with deep knowledge of design patterns, user experience principles, and modern web technologies.',
-        systemPrompt: 'You are a UI Architect. Analyze user requirements and create logical component structures, layouts, and user flows. Focus on usability, accessibility, and scalability.'
+        systemPrompt: 'You are a UI Architect. Analyze user requirements and create logical component structures, layouts, and user flows. Focus on usability, accessibility, and scalability. Provide the output as a JSON object with keys: components, layout, navigation.'
       },
       {
         name: 'style-curator',
         role: 'Creative Design Director',
         goal: 'Create visually stunning and cohesive design systems',
         backstory: 'You are a creative visionary with expertise in color theory, typography, and modern design trends.',
-        systemPrompt: 'You are a Style Curator. Create beautiful, modern design systems with cohesive color palettes, typography, and visual themes. Stay current with design trends while ensuring usability.'
+        systemPrompt: 'You are a Style Curator. Create beautiful, modern design systems with cohesive color palettes, typography, and visual themes. Stay current with design trends while ensuring usability. Provide 4 distinct visual themes as a JSON array of objects, each with keys: name, description, colors (object with primary, secondary, background, surface, accent), typography (object with heading, body), spacing (object with base, tight, loose), components (object with button, card).'
       },
       {
         name: 'code-generator',
         role: 'Full-Stack Developer',
         goal: 'Transform designs into clean, performant, and maintainable code',
         backstory: 'You are a skilled developer with expertise in modern web technologies and best practices.',
-        systemPrompt: 'You are a Code Generator. Convert UI designs into clean, semantic HTML, efficient CSS, and interactive JavaScript. Follow modern web standards and best practices.'
+        systemPrompt: 'You are a Code Generator. Convert UI designs into clean, semantic HTML, efficient CSS, and interactive JavaScript. Follow modern web standards and best practices. For each of the 4 themes provided, generate the HTML, CSS, and JS code. Provide the output as a JSON array of objects, each with keys: themeName, html, css, js.'
       },
       {
         name: 'qa-specialist',
         role: 'QA Engineer & Accessibility Expert',
         goal: 'Ensure code quality, accessibility, and performance standards',
         backstory: 'You are a meticulous QA engineer with deep expertise in web standards and accessibility guidelines.',
-        systemPrompt: 'You are a QA Specialist. Review code for quality, accessibility (WCAG compliance), performance, and cross-browser compatibility. Provide actionable feedback and recommendations.'
+        systemPrompt: 'You are a QA Specialist. Review code for quality, accessibility (WCAG compliance), performance, and cross-browser compatibility. Provide actionable feedback and recommendations. For each of the 4 code implementations, provide a QA score (0-1) and an array of accessibility issues. Provide the output as a JSON array of objects, each with keys: themeName, qaScore, accessibilityIssues (array of strings).'
       }
     ];
 
@@ -113,7 +113,7 @@ class CrewOrchestrator {
 
     return await cerebrasClient.generateCompletion(messages, {
       temperature: 0.7,
-      maxTokens: 2048
+      maxTokens: 4096 // Increased maxTokens for more complex outputs
     });
   }
 
@@ -165,42 +165,105 @@ class CrewOrchestrator {
     codeImplementations: string,
     qaResults: string
   ): UIVariant[] {
-    // For now, return structured mock data
-    // In production, this would parse the AI responses
-    return this.getFallbackVariants(brief);
+    try {
+      const parsedArchitectAnalysis = JSON.parse(architectAnalysis);
+      const parsedStyleVariants = JSON.parse(styleVariants);
+      const parsedCodeImplementations = JSON.parse(codeImplementations);
+      const parsedQaResults = JSON.parse(qaResults);
+
+      const variants: UIVariant[] = [];
+
+      for (let i = 0; i < parsedStyleVariants.length; i++) {
+        const style = parsedStyleVariants[i];
+        const code = parsedCodeImplementations.find((c: any) => c.themeName === style.name);
+        const qa = parsedQaResults.find((q: any) => q.themeName === style.name);
+
+        if (code && qa) {
+          variants.push({
+            id: `variant-${i + 1}`,
+            name: style.name,
+            description: style.description,
+            code: {
+              html: code.html,
+              css: code.css,
+              js: code.js,
+              framework: 'vanilla',
+              dependencies: [],
+              assets: []
+            },
+            preview: {
+              id: `v${i + 1}`,
+              url: `/api/preview-test?variant=v${i + 1}`,
+              thumbnail: '', // This will be generated dynamically later
+              status: 'pending' as const,
+              lastUpdated: new Date().toISOString()
+            },
+            style: style,
+            qaScore: qa.qaScore,
+            accessibility: {
+              score: qa.qaScore, // Assuming qaScore also represents accessibility score for now
+              issues: qa.accessibilityIssues || []
+            }
+          });
+        }
+      }
+      return variants;
+    } catch (error) {
+      console.error('Error parsing workflow results:', error);
+      return this.getFallbackVariants(brief);
+    }
   }
 
   private async getFallbackVariants(brief: UIBrief): Promise<UIVariant[]> {
-    const generatedCode = await cerebrasClient.generateUI(brief.description);
+    // Generate a more complete and visually appealing fallback UI
+    const generatedCode = await cerebrasClient.generateUI(`A simple landing page with a hero section, a feature section, and a call to action, based on the brief: ${brief.description}`);
 
     return [
       {
-        id: 'variant-1',
-        name: 'Generated UI',
-        description: brief.description,
+        id: 'fallback-variant-1',
+        name: 'Basic Landing Page (Fallback)',
+        description: `A basic UI generated as a fallback due to workflow issues: ${brief.description}`,
         code: generatedCode,
         preview: {
-          id: 'v1',
-          url: '/previews/v1/index.html',
+          id: 'fb-v1',
+          url: '/previews/fallback/index.html',
           thumbnail: '', // This will be generated dynamically later
           status: 'pending' as const,
           lastUpdated: new Date().toISOString()
         },
         style: {
-          id: 'style-1',
-          name: 'Generated Style',
-          description: 'Dynamically generated style',
-          theme: 'dynamic',
-          colors: { primary: '#000000', secondary: '#000000', background: '#ffffff' },
-          typography: { heading: 'font-sans', body: 'font-sans' },
-          spacing: { base: '1rem', tight: '0.5rem' },
-          components: { button: '', card: '' }
+          id: 'fallback-style-1',
+          name: 'Clean & Simple',
+          description: 'A clean and simple design with a focus on readability and usability.',
+          theme: 'fallback',
+          colors: {
+            primary: '#4A90E2',
+            secondary: '#50E3C2',
+            background: '#F8F8F8',
+            surface: '#FFFFFF',
+            accent: '#FF6B6B'
+          },
+          typography: {
+            heading: 'font-sans text-2xl font-bold',
+            body: 'font-sans text-base'
+          },
+          spacing: {
+            base: '1rem',
+            tight: '0.5rem',
+            loose: '2rem'
+          },
+          components: {
+            button: 'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600',
+            card: 'bg-white shadow-md rounded-lg p-6'
+          }
         },
-        qaScore: 0,
-        accessibility: { score: 0, issues: [] }
+        qaScore: 0.7, // Assign a default QA score for fallback
+        accessibility: { score: 0.7, issues: ['Ensure sufficient color contrast for text.'] } // Default accessibility issues
       }
     ];
   }
 }
 
 export const crewOrchestrator = new CrewOrchestrator();
+
+
