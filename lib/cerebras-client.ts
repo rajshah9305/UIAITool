@@ -27,7 +27,11 @@ export async function generateCompletion(messages: ChatCompletionMessageParam[],
     return fullContent;
   } catch (error) {
     console.error("Error generating completion with Cerebras AI:", error);
-    return `Error: ${error.message}`;
+    if (error instanceof Error) {
+      throw new Error(`Cerebras AI completion failed: ${error.message}`);
+    } else {
+      throw new Error('An unknown error occurred during Cerebras AI completion.');
+    }
   }
 }
 
@@ -57,11 +61,17 @@ export async function generateUI(prompt: string) {
     } catch (jsonError) {
       console.error('Failed to parse JSON from Cerebras AI response:', jsonError);
       console.error('Raw Cerebras AI response:', fullContent);
-      return { html: `<p>Error: Could not parse UI code. Raw response: ${fullContent}</p>`, css: '', js: '' };
+      throw new Error(`Failed to parse UI code from Cerebras AI. Raw response: ${fullContent}`);
     }
 
   } catch (error) {
     console.error('Error generating UI with Cerebras AI:', error);
-    return { html: `<p>Error generating UI: ${error.message}</p>`, css: '', js: '' };
+    if (error instanceof Error) {
+      throw new Error(`Cerebras AI UI generation failed: ${error.message}`);
+    } else {
+      throw new Error('An unknown error occurred during Cerebras AI UI generation.');
+    }
   }
 }
+
+
