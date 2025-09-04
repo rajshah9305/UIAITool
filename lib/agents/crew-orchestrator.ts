@@ -166,141 +166,41 @@ class CrewOrchestrator {
   ): UIVariant[] {
     // For now, return structured mock data
     // In production, this would parse the AI responses
-    return this.getFallbackVariants({ description: 'Generated UI', type: 'dashboard' });
+    return this.getFallbackVariants(brief);
   }
 
-  private getFallbackVariants(brief: UIBrief): UIVariant[] {
+  private async getFallbackVariants(brief: UIBrief): Promise<UIVariant[]> {
+    const generatedCode = await cerebrasClient.generateUI(brief.description);
+
     return [
       {
         id: 'variant-1',
-        name: 'Modern Minimal',
-        description: 'Clean, modern design with subtle animations',
-        code: {
-          html: `<!DOCTYPE html><html><head><title>Modern UI</title></head><body><div class="container"><h1>Modern Design</h1><p>Clean and minimal interface</p></div></body></html>`,
-          css: `body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #fff; color: #333; } .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }`,
-          js: `console.log('Modern UI loaded');`,
-          framework: 'vanilla' as const,
-          dependencies: [],
-          assets: []
-        },
+        name: 'Generated UI',
+        description: brief.description,
+        code: generatedCode,
         preview: {
           id: 'v1',
           url: '/previews/v1/index.html',
-          thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjEwMCIgeT0iNzUiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk1vZGVybjwvdGV4dD48L3N2Zz4=',
-          status: 'ready' as const,
+          thumbnail: '', // This will be generated dynamically later
+          status: 'pending' as const,
           lastUpdated: new Date().toISOString()
         },
         style: {
           id: 'style-1',
-          name: 'Modern Minimal',
-          description: 'Clean and minimal design',
-          theme: 'modern-minimal',
-          colors: { primary: '#007bff', secondary: '#6c757d', background: '#ffffff' },
-          typography: { heading: 'font-semibold', body: 'font-normal' },
+          name: 'Generated Style',
+          description: 'Dynamically generated style',
+          theme: 'dynamic',
+          colors: { primary: '#000000', secondary: '#000000', background: '#ffffff' },
+          typography: { heading: 'font-sans', body: 'font-sans' },
           spacing: { base: '1rem', tight: '0.5rem' },
-          components: { button: 'bg-blue-500 text-white', card: 'bg-white shadow-sm' }
+          components: { button: '', card: '' }
         },
-        qaScore: 0.95,
-        accessibility: { score: 0.92, issues: [] }
-      },
-      {
-        id: 'variant-2',
-        name: 'Bold Vibrant',
-        description: 'Energetic design with bold colors and dynamic elements',
-        code: {
-          html: `<!DOCTYPE html><html><head><title>Bold UI</title></head><body><div class="container"><h1>Bold Design</h1><p>Vibrant and energetic interface</p></div></body></html>`,
-          css: `body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #ff6b6b, #4ecdc4); color: #fff; } .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }`,
-          js: `console.log('Bold UI loaded');`,
-          framework: 'vanilla' as const,
-          dependencies: [],
-          assets: []
-        },
-        preview: {
-          id: 'v2',
-          url: '/previews/v2/index.html',
-          thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmZjZiNmI7c3RvcC1vcGFjaXR5OjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM0ZWNkYzQ7c3RvcC1vcGFjaXR5OjEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0idXJsKCNnKSIvPjx0ZXh0IHg9IjEwMCIgeT0iNzUiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Cb2xkPC90ZXh0Pjwvc3ZnPg==',
-          status: 'ready' as const,
-          lastUpdated: new Date().toISOString()
-        },
-        style: {
-          id: 'style-2',
-          name: 'Bold Vibrant',
-          description: 'Energetic and vibrant design',
-          theme: 'bold-vibrant',
-          colors: { primary: '#ff6b6b', secondary: '#4ecdc4', background: 'linear-gradient(135deg, #ff6b6b, #4ecdc4)' },
-          typography: { heading: 'font-bold', body: 'font-medium' },
-          spacing: { base: '1.25rem', tight: '0.75rem' },
-          components: { button: 'bg-red-500 text-white', card: 'bg-white/10 backdrop-blur' }
-        },
-        qaScore: 0.88,
-        accessibility: { score: 0.85, issues: ['Consider higher contrast for better readability'] }
-      },
-      {
-        id: 'variant-3',
-        name: 'Dark Futuristic',
-        description: 'Sleek dark theme with futuristic elements',
-        code: {
-          html: `<!DOCTYPE html><html><head><title>Dark UI</title></head><body><div class="container"><h1>Dark Design</h1><p>Futuristic dark interface</p></div></body></html>`,
-          css: `body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0f0f0f; color: #00ff88; } .container { max-width: 1200px; margin: 0 auto; padding: 2rem; border: 1px solid #00ff88; }`,
-          js: `console.log('Dark UI loaded');`,
-          framework: 'vanilla' as const,
-          dependencies: [],
-          assets: []
-        },
-        preview: {
-          id: 'v3',
-          url: '/previews/v3/index.html',
-          thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzBmMGYwZiIvPjx0ZXh0IHg9IjEwMCIgeT0iNzUiIGZpbGw9IiMwMGZmODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRhcms8L3RleHQ+PC9zdmc+',
-          status: 'ready' as const,
-          lastUpdated: new Date().toISOString()
-        },
-        style: {
-          id: 'style-3',
-          name: 'Dark Futuristic',
-          description: 'Sleek dark futuristic design',
-          theme: 'dark-futuristic',
-          colors: { primary: '#00ff88', secondary: '#ff0080', background: '#0f0f0f' },
-          typography: { heading: 'font-bold tracking-wide', body: 'font-normal' },
-          spacing: { base: '1rem', tight: '0.5rem' },
-          components: { button: 'bg-green-500 text-black', card: 'bg-gray-900 border border-green-500' }
-        },
-        qaScore: 0.93,
-        accessibility: { score: 0.90, issues: [] }
-      },
-      {
-        id: 'variant-4',
-        name: 'Clean Professional',
-        description: 'Professional business-oriented design',
-        code: {
-          html: `<!DOCTYPE html><html><head><title>Professional UI</title></head><body><div class="container"><h1>Professional Design</h1><p>Clean business interface</p></div></body></html>`,
-          css: `body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fa; color: #495057; } .container { max-width: 1200px; margin: 0 auto; padding: 2rem; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }`,
-          js: `console.log('Professional UI loaded');`,
-          framework: 'vanilla' as const,
-          dependencies: [],
-          assets: []
-        },
-        preview: {
-          id: 'v4',
-          url: '/previews/v4/index.html',
-          thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2Y4ZjlmYSIvPjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxMTAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNkZWUyZTYiLz48dGV4dCB4PSIxMDAiIHk9Ijc4IiBmaWxsPSIjNDk1MDU3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Qcm9mZXNzaW9uYWw8L3RleHQ+PC9zdmc+',
-          status: 'ready' as const,
-          lastUpdated: new Date().toISOString()
-        },
-        style: {
-          id: 'style-4',
-          name: 'Clean Professional',
-          description: 'Professional business design',
-          theme: 'clean-professional',
-          colors: { primary: '#007bff', secondary: '#6c757d', background: '#f8f9fa' },
-          typography: { heading: 'font-semibold', body: 'font-normal' },
-          spacing: { base: '1rem', tight: '0.5rem' },
-          components: { button: 'bg-blue-600 text-white', card: 'bg-white shadow border' }
-        },
-        qaScore: 0.97,
-        accessibility: { score: 0.96, issues: [] }
+        qaScore: 0,
+        accessibility: { score: 0, issues: [] }
       }
     ];
-  }
+
+  
 }
 
 export const crewOrchestrator = new CrewOrchestrator();
