@@ -1,124 +1,67 @@
-class CerebrasClient {
-  private apiKey: string;
-  private baseUrl: string = 'https://api.cerebras.ai/v1';
+import { Cerebras } from '@cerebras/sdk';
+import { ChatCompletionMessageParam } from '@cerebras/sdk/resources/chat/completions';
 
-  constructor() {
-    this.apiKey = process.env.CEREBRAS_API_KEY || '';
-  }
+const cerebras = new Cerebras({
+  apiKey: process.env.CEREBRAS_API_KEY,
+});
 
-  async generateCompletion(messages: Array<{role: string, content: string}>, options?: {
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-  }) {
-    if (!this.apiKey) {
-      return this.getFallbackResponse(messages);
+export async function generateCompletion(messages: ChatCompletionMessageParam[], options?: {
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+}) {
+  try {
+    const stream = await cerebras.chat.completions.create({
+      messages: messages,
+      model: options?.model || "llama-4-scout-17b-16e-instruct",
+      stream: true,
+      max_completion_tokens: options?.maxTokens || 2048,
+      temperature: options?.temperature || 0.2,
+      top_p: 1,
+    });
+
+    let fullContent = "";
+    for await (const chunk of stream) {
+      fullContent += chunk.choices[0]?.delta?.content || "";
     }
-
-    try {
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages,
-          model: options?.model || "llama-4-maverick-17b-128e-instruct",
-          max_completion_tokens: options?.maxTokens || 4096,
-          temperature: options?.temperature || 0.6,
-          top_p: 0.9
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.choices[0]?.message?.content || this.getFallbackResponse(messages);
-    } catch (error) {
-      console.error('Cerebras API error:', error);
-      return this.getFallbackResponse(messages);
-    }
-  }
-
-  async streamCompletion(messages: Array<{role: string, content: string}>, onChunk: (chunk: string) => void) {
-    if (!this.apiKey) {
-      onChunk(this.getFallbackResponse(messages));
-      return;
-    }
-
-    try {
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages,
-          model: "llama-4-maverick-17b-128e-instruct",
-          stream: true,
-          max_completion_tokens: 4096,
-          temperature: 0.6,
-          top_p: 0.9
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error('No reader available');
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const chunk = new TextDecoder().decode(value);
-        const lines = chunk.split('\n').filter(line => line.trim());
-        
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') return;
-            
-            try {
-              const parsed = JSON.parse(data);
-              const content = parsed.choices[0]?.delta?.content || '';
-              if (content) onChunk(content);
-            } catch (e) {
-              // Skip invalid JSON
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Cerebras streaming error:', error);
-      onChunk(this.getFallbackResponse(messages));
-    }
-  }
-
-  private getFallbackResponse(messages: Array<{role: string, content: string}>): string {
-    const lastMessage = messages[messages.length - 1]?.content || '';
-    
-    // Simple fallback responses based on content
-    if (lastMessage.includes('color') || lastMessage.includes('style')) {
-      return 'I can help you adjust the color scheme and styling. What specific changes would you like to make?';
-    }
-    
-    if (lastMessage.includes('layout') || lastMessage.includes('structure')) {
-      return 'I can help restructure the layout and components. What layout changes are you looking for?';
-    }
-    
-    if (lastMessage.includes('export') || lastMessage.includes('download')) {
-      return 'I can help you export your design. Which format would you prefer - React, Vue, or vanilla HTML/CSS?';
-    }
-    
-    return 'I understand your request. Let me help you improve your UI design. Could you be more specific about what you\'d like to change?';
+    return fullContent;
+  } catch (error) {
+    console.error("Error generating completion with Cerebras AI:", error);
+    return `Error: ${error.message}`;
   }
 }
 
-export const cerebrasClient = new CerebrasClient();
+export async function generateUI(prompt: string) {
+  try {
+    const stream = await cerebras.chat.completions.create({
+      messages: [
+        { role: 'system', content: 'You are a UI generator. Generate HTML, CSS, and JavaScript for the requested UI. Provide the code in a JSON object with html, css, and js properties.' },
+        { role: 'user', content: prompt },
+      ],
+      model: 'llama-4-scout-17b-16e-instruct',
+      stream: true,
+      max_completion_tokens: 2048,
+      temperature: 0.2,
+      top_p: 1,
+    });
+
+    let fullContent = '';
+    for await (const chunk of stream) {
+      fullContent += chunk.choices[0]?.delta?.content || '';
+    }
+
+    // Attempt to parse the JSON response
+    try {
+      const parsedContent = JSON.parse(fullContent);
+      return parsedContent;
+    } catch (jsonError) {
+      console.error('Failed to parse JSON from Cerebras AI response:', jsonError);
+      console.error('Raw Cerebras AI response:', fullContent);
+      return { html: `<p>Error: Could not parse UI code. Raw response: ${fullContent}</p>`, css: '', js: '' };
+    }
+
+  } catch (error) {
+    console.error('Error generating UI with Cerebras AI:', error);
+    return { html: `<p>Error generating UI: ${error.message}</p>`, css: '', js: '' };
+  }
+}
